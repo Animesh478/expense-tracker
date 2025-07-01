@@ -16,6 +16,8 @@ function display() {
   });
 }
 
+// Add expense functionality
+
 function onAddExpense(e) {
   e.preventDefault();
 
@@ -41,9 +43,11 @@ function addExpenseToDOM(expense, description, category) {
 
   const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "Delete Expense";
+  deleteBtn.className = "delete-btn";
 
   const editBtn = document.createElement("button");
   editBtn.textContent = "Edit Expense";
+  editBtn.className = "edit-btn";
 
   li.appendChild(deleteBtn);
   li.appendChild(editBtn);
@@ -65,6 +69,34 @@ function addExpenseToStorage(expense, description, category) {
   localStorage.setItem("expenses", JSON.stringify(expensesFromStorage));
 }
 
+// Delete Expense Functionality
+
+function onDeleteExpense(e) {
+  removeExpenseFromDOM(e);
+  removeExpenseFromStorage(e);
+}
+
+function removeExpenseFromDOM(e) {
+  const expenseToDelete = e.target.parentElement;
+  expenseToDelete.remove();
+}
+
+function removeExpenseFromStorage(e) {
+  let expensesFromStorage = getExpensesFromStorage();
+
+  expensesFromStorage = expensesFromStorage.filter((expense) => {
+    return !e.target.parentElement.textContent.includes(expense.description);
+  });
+
+  localStorage.setItem("expenses", JSON.stringify(expensesFromStorage));
+}
+
+// Edit expense functionality
+
+function onEditExpense() {}
+
+// Retrieving from local Storage
+
 function getExpensesFromStorage() {
   let expensesFromStorage;
 
@@ -79,5 +111,13 @@ function getExpensesFromStorage() {
 
 // Event listeners
 form.addEventListener("submit", onAddExpense);
+
+expenseList.addEventListener("click", (e) => {
+  if (e.target.className === "delete-btn") {
+    onDeleteExpense(e);
+  } else if (e.target.className === "edit-btn") {
+    onEditExpense(e);
+  }
+});
 
 display();
