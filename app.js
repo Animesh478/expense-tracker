@@ -4,6 +4,8 @@ const inputDescription = document.getElementById("description");
 const inputCategory = document.getElementById("category");
 const expenseList = document.querySelector("ul");
 
+let isEditMode = false;
+
 function display() {
   const expensesFromStorage = getExpensesFromStorage();
 
@@ -24,6 +26,23 @@ function onAddExpense(e) {
   const expense = inputExpense.value;
   const description = inputDescription.value;
   const category = inputCategory.value;
+
+  // check for edit mode
+  if (isEditMode) {
+    const editedExpense = document.querySelector(".edit-mode");
+
+    let expensesFromStorage = getExpensesFromStorage();
+    expensesFromStorage = expensesFromStorage.filter((expenseDetails) => {
+      return !editedExpense.textContent.includes(expenseDetails.description);
+    });
+
+    // removing the expense from storage
+    localStorage.setItem("expenses", JSON.stringify(expensesFromStorage));
+
+    editedExpense.classList.remove("edit-mode");
+    editedExpense.remove(); // remove it from DOM
+    isEditMode = false;
+  }
 
   // adding the expense to DOM
   addExpenseToDOM(expense, description, category);
@@ -93,7 +112,21 @@ function removeExpenseFromStorage(e) {
 
 // Edit expense functionality
 
-function onEditExpense() {}
+function onEditExpense(e) {
+  isEditMode = true;
+  let expensesFromStorage = getExpensesFromStorage();
+
+  expensesFromStorage.forEach((expenseDetails) => {
+    if (
+      e.target.parentElement.textContent.includes(expenseDetails.description)
+    ) {
+      e.target.parentElement.classList.add("edit-mode");
+      inputExpense.value = expenseDetails.expense;
+      inputCategory.value = expenseDetails.category;
+      inputDescription.value = expenseDetails.description;
+    }
+  });
+}
 
 // Retrieving from local Storage
 
